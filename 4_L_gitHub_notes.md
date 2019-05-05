@@ -2,6 +2,7 @@
 
 
 'git' commands
+
           git  init
             initiates git tracking of the file you are in as a repsoitory
           git add "x"
@@ -38,14 +39,17 @@
             you can go into the Branch to work on it there  and not the more main branch "branchstalk?" it came from   
 
 Forking
+
         This can be done on GitHub.
         go to the website hosting the file you wish to copy onto your account and press the for option in the upper right corner
         a repsitory should now be in you github with this contents in it
 
 Adding Collabroators
+
         This can be done on GitHub.com  
           
 'git remote' commands
+
         git remote add <remotename> <HttpsFromGitHub>
           this will add in a place for you to push and pull from 
           <remotename> 
@@ -59,7 +63,8 @@ Adding Collabroators
 
 
             
-  'git config' commands
+  'git config' commands  
+  
         git config --global push.default simple
             prevents anoying message from being sent when you push
         git config --global credential.helper 'cache --timeout=14400'
