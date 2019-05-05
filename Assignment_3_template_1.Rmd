@@ -1,0 +1,215 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+__Name:__ Chad Pittman
+
+__Student ID:__ 914960676
+
+For each of the exercises below, take advantage of R markdown and the notebook features.  That is include the code and have Rstudio embed your answers.  See Exercise 0 for an example
+
+
+## Exercise 0 (example)
+_Provide the name of your current working directory and list the files therein_
+
+(You would then click on the > arrow in your answer code block to run it before continuing)
+
+## Exercise 1
+_Use sum() to determine the sum of numbers from 2000 to 20000.  Provide your code and the actual sum in your answer._
+```{r}
+sum(2000:20000)
+```
+The sum is 199,011,000.
+__________________________________________________________________
+## Exercise 2
+_In one or two sentences, describe what the above code snippet it did._
+```{r}  
+a <- 5     #The variable 'a' is assigned the intiger 5
+b <- 2:20  #The variable 'b' is assigned the intiger set 2 to 20
+a          #the variables of a are printed as '5'
+b          #the variables of 'b' are printed as '2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20'
+```
+  The two variables 'a' and 'b' are assigned the integer 5 and 2 to 20 respectively. As exicuted, they will then print accordingly by listing the variable name and then the variables that each contains.
+__________________________________________________________________
+## Exercise 3
+_Add the contents of a and b together and place the results in a new object.  Examine the result.  Include your code.  Try using both `sum()` and `+`; do you get different results?  If so, why?_
+```{r}
+my_sumFunction <- sum(a+b)
+my_sumSimple <- a + b
+```
+* Yes, you get different results. 
+* The use of sum() function, you get the results of what the addition of 5 to every value 2 to 20 adds up to in a final intiger of 304. The simple exicution of 'a + b' prints the resulting set of integers that were used to be added up to 304, but as a list 7 to 25.
+
+__________________________________________________________________
+## Exercise 4
+_What is the sum of the 5th through 10th element of object b?  Provide your code and the sum._
+
+```{r}
+sum(b[5:10])
+```
+* The sum of elements 5-10 is 51.
+
+__________________________________________________________________
+## Exercise 5
+_What is the sum of the 3rd, 8th, and 10th element of b?  For both of these exercises should only need to have "b" in your code once._
+
+```{r}
+sum(b[c(3,8,10)])
+```
+* The sum is 24 as it calls and adds 4,9,and 11 from 'b'.
+
+__________________________________________________________________
+## Exercise 6
+```{r}
+m <- matrix(data=1:25,ncol=5,byrow=T)
+```
+
+_When extracting from a 2-dimensional object, which number specifies rows and which specifies columns?_
+* The first number is for rows.
+* The second number is for columns.
+
+_What does `m[3,]` do?_
+```{r}
+m <- matrix(data=1:25,ncol=5,byrow=T)
+m[3,]
+```
+* m[3,] calls the vector of the thrid row out of variable 'm' and prints out the numbers it contains as 11, 12, 13, 14, and 15.
+
+_How can you extract the 3rd, 4th and 5th columns of m together as one object?_
+```{r}
+m <- matrix(data=1:25,ncol=5,byrow=T)
+my_oneObject <- m[,3:5]
+my_oneObject
+```
+
+__________________________________________________________________
+## Exercise 7
+_What does the cbind command do?  How about rbind?_
+* cbind combinds the columns of the matrix or data.fram
+* rbind conbinds the rows of the matrix or data.frame
+
+_Create a new object "n" where the first row is a new row of numbers (your choice) and the following rows are the rows from matrix m._
+```{r}
+n <- rbind(26:30, m)
+n
+```
+_Want more? (OPTIONAL) do the same but reverse the order of the rows from matrix m._
+
+```{r}
+n <- rbind(26:30, m[5:1,])
+n
+```
+__________________________________________________________________
+## Exercise 8
+````{r}
+library(tidyverse)
+plant_worm <- read_tsv("~/Assignment_3_/plant_vs_worm.blastout_v2.1.gz",col_names=FALSE)
+worm_plant <- read_tsv("~/Assignment_3_/worm_vs_plant.blastout_v2.1.gz",col_names=FALSE)
+
+colnames(plant_worm) <- c("query_id", "subject_id", "pct_ident", "len", "mis", "gaps", "qb", "qe", "sb", "se", "E", "Score")
+colnames(worm_plant) <- c("query_id","subject_id","pct_ident", "len", "mis", "gaps", "qb", "qe", "sb", "se", "E", "Score")
+
+head(plant_worm)
+head(worm_plant)
+summary(plant_worm)
+summary(worm_plant)
+
+plant_worm_best <- plant_worm %>%
+  arrange(query_id, E, desc(Score)) %>%
+  filter(!duplicated(query_id))
+worm_plant_best <- worm_plant %>%
+  arrange(query_id, E, desc(Score)) %>%
+  filter(!duplicated(query_id))
+````
+_How many hits have an e-value of 0?_
+
+```{r}
+filter(plant_worm_best, E == 0)
+filter(worm_plant_best, E == 0)
+```
+* plant_worm_best had 468 hits with an e-value of 0.
+* worm_plant_best had 288 hits with an e-value of 0.
+
+_How many have hits have a percent identity > 50?_
+```{r}
+table(plant_worm_best$pct_ident > 50)
+table(worm_plant_best$pct_ident > 50)
+```
+* plant_worm_best had 1706 hits with a percent identity > 50.
+* worm_plant_best had 1041 hits with a percent identity > 50.
+
+_Recalculate the above values but in percentage of hits rather than absolute values._
+```{r}
+#Plant_Worm Pct_ID>50 %:
+sum(plant_worm_best$E=="0") / length(plant_worm_best$query_id) * 100
+sum(plant_worm_best$pct_ident>="50")/ length(plant_worm_best$query_id) * 100
+#Worm_Plant Pct_ID>50 %:
+sum(worm_plant_best$E=="0") / length(worm_plant_best$query_id) * 100
+sum(worm_plant_best$pct_ident>="50") / length(worm_plant_best$query_id) * 100
+```
+* With E-value of 0:  
+plant_worm_best: 1.73  %
+worm_plant_best: 1.49  %
+
+* With >50% identity:  
+plant_worm_best: 6.33  %  
+worm_plant_best: 5.38  %
+
+_How many hits have an E-value of 0 and have a percent identity less than 50?_
+```{r}
+sum(plant_worm_best$pct_ident<50 & plant_worm_best$E==0)
+sum(worm_plant_best$pct_ident<50 & worm_plant_best$E==0)
+```
+
+* plant_worm_best: 219  
+* worm_plant_best: 132
+
+_What is the minimum percent identity of the hits with an E-value equal to 0?_
+
+```{r}
+min(plant_worm_best$pct_ident[plant_worm_best$E==0])
+min(worm_plant_best$pct_ident[worm_plant_best$E==0])
+```
+
+
+* plant_worm_best: 29.099  %  
+* worm_plant_best: 29.575  %
+
+__________________________________________________________________
+## Excercise 9
+_Are you surprised that sequences with relatively low percent identity can still have an E-value of 0?_
+No, one of the points that the last lab was making during the parralog search was that we needed to look atht physical alignments to determin if there were high matches across the whole protein or just localy. Proteins can randomly have high homology in certain places but not most of the rest.
+_State a hypothesis about what alignment properties might produce a zero E-value even when the percent identity is less than 50%._
+
+A proterty could be a higher than typical number gaps in a protien when alignment yeilds results of a zero E-value while %ID<50
+
+_Test your hypothesis_
+```{r}
+#worm plant
+worm_plant_hpi <- worm_plant_best%>%
+  arrange(E, desc(pct_ident))
+sum((head(worm_plant_hpi, n=15L))$gaps) / 15
+sum((head(worm_plant_lpi, n=15L))$gaps) / 15
+#plant worm
+plant_worm_hpi <- plant_worm_best %>% 
+  arrange(E, desc(pct_ident))
+sum((head(plant_worm_hpi, n=15L))$gaps) / 15 
+sum((head(plant_worm_lpi, n=15L))$gaps) / 15
+```
+
+The hypothesis is supported by both the hpi's yeilding way less gaps than the lpi's. 
+
+__________________________________________________________________
+## Excercise 10
+_It sometimes is useful to create a random subset of a large data set like the fly.worm results.  Create a new dataframe `fly.worm.small` that has 1,000 rows taken at random from the larger data set._
+
+```{r}
+plant_worm.small <- plant_worm[sample(nrow(plant_worm), 1000, replace = FALSE),]
+```
+__________________________________________________________________
+** Turning in the assignment**
+
+* Click the arrow next to the "Preview" Button and choose the "knit-to-html" option to generate an up-to-date html version of your notebook.  Check it to make sure you are happy with its content.
+* add your .Rmd and .html files to the repository and commit the changes.
+* push the changes

@@ -1,0 +1,118 @@
+---
+title: "Assignment 3, part2"
+output: html_notebook
+---
+
+__Name:__ Chad Pittman
+
+__Student ID:__ 914960676
+
+For each of the exercises below, take advantage of R markdown and the notebook features.  That is include the code and have Rstudio embed your answers.  See Exercise 0 for an example
+
+For this lab we will continue to expand our R toolkit and apply what we learn to the BLAST results.
+
+_______________________________________________________________________________________________________
+**Exercise 1**
+__Look at the help page for `lead` and examine the `E` and `nextE` columns.  What does `lead()` do?  Why are there NAs in the `nextE` column?__
+
+The lead() function finds the next or previous values in a vector. It shows the next best E scores. NAs will populate the in the nextE column when there are no more E scores left above your evalue.
+
+_______________________________________________________________________________________________________
+**Exercise 2**
+__Explain the effect of `by=c("subject_id"="query_id")` in the above code. What does this do and why are we joining this way?__
+
+The two strings in the line are considered equivilant. In reality, they are names of columns. This causes the columns to be joined together. This is useful as in reality these columns have the same data and can lead to conflict potentially when two identical columns have different names. And because in plant_worm and worm_plant, plant and worm are the queries repsectivly. The function left_join() is also now possible as a result. We are looking for orthologs and/or paralogs between the proteoms.
+
+_______________________________________________________________________________________________________
+**Exercise 3**
+
+__We next need to filter the `plant_with_recip` tibble to create a new tibble that only has the candidate ortholog pairs.  Consider what criteria you should use, and answer these questions:__
+
+
+__What relationship do you want between the "query_id" and "subject_id.worm_plant" columns?__
+* "query_id" & "subject_id.worm_plant" columns to have the same protein in common.
+
+__E-value threshold for "E.plant_worm".  I recommend < 1e-04; what is this filter doing?__
+* The insignificant E-values are filtered out of the potential orthalogs by removeing the low values in the plant to worm comparison.
+
+__Threshold for E_diff.plant_worm.  I recommend < -2; what is this filter doing?__
+* This filter cleans up the results. It removes those that arnt at least 100% between the E value and the next best E value. 100% because log(100) is 2. And the negitive direction because it is the difference between them.
+
+__Filter the results based on the above criteria to retain only those rows where there is a reciprocal blast that also meet the E-value E-value and E_diff thresholds; place the results in a new object `plant_with_worm_orthologs`__
+```{r}
+plant_with_worm_orthologs <- plant_with_recip %>% filter(query_id == subject_id.worm_plant, E.plant_worm < 1e-04, E_diff.plant_worm < -2)
+nrow(plant_with_worm_orthologs)
+```
+
+__How many candidate orthologs do you have?__
+* I found 2443 ortholog candidates.
+
+_______________________________________________________________________________________________________
+**Exercise 4**
+__Repeat the analysis above, but this time create a table of worm genes that have plant orthologs.  How many do you have?__
+__Hint: The code needed to remove isoforms is a little bit different for the worm proteins and is shown below.  You will still need to use left_join to create worm_with_recip before running the code below, and then filter afterwards.__
+
+```{r}
+worm_with_recip <- left_join(worm_plant_best, plant_worm_best, by = c("subject_id"="query_id"),suffix = c(".worm_plant", ".plant_worm")) %>% select(query_id, subject_id, subject_id.plant_worm, everything())
+
+worm_with_recip <- worm_with_recip %>%
+  mutate(query_id = str_replace(query_id,"[a-z]$",""), 
+         subject_id.plant_worm=str_replace(subject_id.plant_worm, "[a-z]$","")) %>%
+  arrange(query_id, Score.worm_plant) %>%
+  filter(!duplicated(query_id)) %>%
+  ungroup()
+worm_with_plant_orthologs <- worm_with_recip %>% filter(query_id == subject_id.plant_worm) %>% filter(E.worm_plant < 1e-04) %>% filter(E_diff.worm_plant < -2)
+head(worm_with_plant_orthologs)
+nrow(worm_with_plant_orthologs)
+```
+
+* I found 1885 orthologs
+
+_______________________________________________________________________________________________________
+**Exercise 5**
+__Use ggplot to explore the relationship between score ("Score") and alignment length("len") in the "worm_plant_best" data set.  Provide a plot that illustrates the relationship and describe the relationship in words.__
+
+```{r}
+worm_plant_best %>%
+  ggplot(mapping = aes(x = Score, y = len)) + geom_point(col= "red") + geom_smooth(method = "lm") + ggtitle(" Score to Length")+ ylab("Length") 
+```
+* Length of alignment and score have a positive corrilation as they increase. Its noteworthy that the data increases in error also.
+
+_______________________________________________________________________________________________________
+**Exercise 6**
+__How does percent identity ("pct_identity") affect the relationship between score and length?  Update your plot from exercise 5 to include pct_identity in a way that can help you answer the question.__
+
+```{r}
+worm_plant_best %>%
+  ggplot(mapping = aes(x = Score, y = len)) + geom_point(col= pct_ident) + geom_smooth(method = "lm") + ggtitle("Score to Length")+ ylab("Length") 
+```
+* The alignments with scores in common trend to lower %ID as the lengths get longer. Comparitivley, those with the same lengths trend to higher scores. 
+
+_______________________________________________________________________________________________________
+**Exercise 7**
+__Continuing to use the "worm_plant_best" data set, make a plot that shows the relationship between E-value ("E") and score ("Score").  If your plot looks like an "L" think about how to transform the axis or axes scale to make the plot more informative.  You may want to filter to remove E values that are 0.  Try it both ways.__
+```{r}
+worm_plant_best  %>% 
+  filter(E > 0)%>% 
+  ggplot(mapping = aes(x = E, y = Score)) + geom_point() + scale_x_log10() + xlab("E-val") + ggtitle("Score to E-value")
+worm_plant_best_E0_no <- worm_plant_best %>% filter(E != 0)
+worm_plant_best_E0_no %>%  
+  ggplot(mapping = aes(x = E, y = Score)) + geom_point() +  scale_x_log10() + xlab("E-value") + geom_smooth(method = "lm") +  ggtitle("Score to E-value")
+```
+_______________________________________________________________________________________________________
+**Exercise 8**
+__In the previous lab's Exercise 10 you were asked to "State a hypothesis about what alignment properties might produce a zero E-value even when the percent identity is less than 50%." and then to test it.  Now make a plot to illustrate your hypothesis / test.  Probably you want a boxplot or a violin plot.__
+```{r test}
+worm_plant_best_E0 <- worm_plant_best %>% 
+  filter(!duplicated(query_id)) %>% 
+  filter(E == 0) 
+worm_plant_best_E0 %>% 
+  ggplot(mapping = aes(x = mis, y = len)) + geom_violin(fill = "red")+ facet_grid(~pct_ident > 50) + xlab("Mismatches") + ylab("Length") + ggtitle("%ID & Mismatches")
+```
+_______________________________________________________________________________________________________
+**Turning in the assignment**
+
+* For both this template and for part 1:
+* Click the "Preview" Button to generate an up-to-date html version of your notebook.  Check it to make sure you are happy with its content.
+* add your .Rmd and .nb.html files to the repository and commit the changes.
+* push the changes
