@@ -1,7 +1,6 @@
 # Template for BLAST, orthologs, and paralogs (Week 2-3, 18 pts possible)
 
 __Name:__ Chad Pittman
-
 __Student ID:__ 914960676
 
 *_Please answer the following questions which are each worth 2 points. Be clear and concise with any written answers. Late assignments will be penalized with a 2pt deduction per day without prior communication of extenuating circumstances._*

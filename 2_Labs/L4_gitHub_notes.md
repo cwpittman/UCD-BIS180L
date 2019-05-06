@@ -1,4 +1,4 @@
-### Git Hub notes
+### L4.Git Hub notes
 
 
 'git' commands
@@ -37,6 +37,9 @@
               deletes specified branch  
           git checkout <BranchName>
             you can go into the Branch to work on it there  and not the more main branch "branchstalk?" it came from   
+          git reset --hard HEAD^
+            resets to last push.. gets reid of last commit
+            
 
 Forking
 

@@ -2,8 +2,7 @@
 title: "Assignment 4"
 output: html_document
 ---
-__Name:__ Chad Pittman
-
+__Name:__ Chad Pittman    
 __Student ID:__ 914960676
 
 ## Assignment 4: Rice SNPs and GWAS

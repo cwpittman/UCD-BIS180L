@@ -3,8 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-__Name:__ Chad Pittman
-
+__Name:__ Chad Pittman  
 __Student ID:__ 914960676
 
 For each of the exercises below, take advantage of R markdown and the notebook features.  That is include the code and have Rstudio embed your answers.  See Exercise 0 for an example
