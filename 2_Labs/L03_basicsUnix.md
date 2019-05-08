@@ -4,6 +4,9 @@
         prints date
       man "x"
         opens manual about "x"
+      --help
+        same as man but with other options
+          ex x --help | less
       history
         populates a history of what has been entered into the terminal
       printenv "x"

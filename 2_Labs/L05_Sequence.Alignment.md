@@ -1,6 +1,8 @@
 ### Lab 5 Sequence Alignment
 
-
+`grep`
+grep `<searchPerameter>`-A # <file>
+  this finds what you are looking for and the next line only.
 # Part 1
 
 helpful actions
